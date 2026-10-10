@@ -14,19 +14,19 @@ const iconMap: Record<string, React.ReactNode> = {
 }
 
 const codeLines = [
-  { parts: [{ t: "import", c: "text-purple-400" }, { t: " { Agent } ", c: "" }, { t: "from", c: "text-purple-400" }, { t: " ", c: "" }, { t: `"@devora/ai"`, c: "text-emerald-300" }] },
+  { parts: [{ t: "import", c: "text-violet-300" }, { t: " { Agent } ", c: "" }, { t: "from", c: "text-violet-300" }, { t: " ", c: "" }, { t: `"@devora/ai"`, c: "text-cyan-300" }] },
   { parts: [] },
-  { parts: [{ t: "const", c: "text-purple-400" }, { t: " ", c: "" }, { t: "tutor", c: "text-cyan-300" }, { t: " = ", c: "" }, { t: "new", c: "text-purple-400" }, { t: " ", c: "" }, { t: "Agent", c: "text-yellow-300" }, { t: "({", c: "" }] },
-  { parts: [{ t: "  model: ", c: "" }, { t: `"devora-7b"`, c: "text-emerald-300" }, { t: ",", c: "" }] },
-  { parts: [{ t: "  mode: ", c: "" }, { t: `"socratic"`, c: "text-emerald-300" }, { t: ",", c: "" }] },
-  { parts: [{ t: "  hints: ", c: "" }, { t: "true", c: "text-orange-400" }, { t: ",", c: "" }] },
+  { parts: [{ t: "const", c: "text-violet-300" }, { t: " ", c: "" }, { t: "tutor", c: "text-white" }, { t: " = ", c: "" }, { t: "new", c: "text-violet-300" }, { t: " ", c: "" }, { t: "Agent", c: "text-violet-200" }, { t: "({", c: "" }] },
+  { parts: [{ t: "  model: ", c: "" }, { t: `"devora-7b"`, c: "text-cyan-300" }, { t: ",", c: "" }] },
+  { parts: [{ t: "  mode: ", c: "" }, { t: `"socratic"`, c: "text-cyan-300" }, { t: ",", c: "" }] },
+  { parts: [{ t: "  hints: ", c: "" }, { t: "true", c: "text-amber-300" }, { t: ",", c: "" }] },
   { parts: [{ t: "})", c: "" }] },
   { parts: [] },
-  { parts: [{ t: "const", c: "text-purple-400" }, { t: " ", c: "" }, { t: "solution", c: "text-cyan-300" }, { t: " = ", c: "" }, { t: "await", c: "text-purple-400" }, { t: " tutor.", c: "" }, { t: "explain", c: "text-yellow-300" }, { t: "({", c: "" }] },
-  { parts: [{ t: "  concept: ", c: "" }, { t: `"closures"`, c: "text-emerald-300" }, { t: ",", c: "" }] },
-  { parts: [{ t: "  level: ", c: "" }, { t: `"intermediate"`, c: "text-emerald-300" }, { t: ",", c: "" }] },
+  { parts: [{ t: "const", c: "text-violet-300" }, { t: " ", c: "" }, { t: "solution", c: "text-white" }, { t: " = ", c: "" }, { t: "await", c: "text-violet-300" }, { t: " tutor.", c: "" }, { t: "explain", c: "text-violet-200" }, { t: "({", c: "" }] },
+  { parts: [{ t: "  concept: ", c: "" }, { t: `"closures"`, c: "text-cyan-300" }, { t: ",", c: "" }] },
+  { parts: [{ t: "  level: ", c: "" }, { t: `"intermediate"`, c: "text-cyan-300" }, { t: ",", c: "" }] },
   { parts: [{ t: "})", c: "" }] },
-  { parts: [{ t: `// → 3 hints, 1 exercise, 0 spoilers`, c: "text-slate-500" }] },
+  { parts: [{ t: `// → 3 hints, 1 exercise, 0 spoilers`, c: "text-violet-300/50" }] },
 ]
 
 function HeroSection() {
@@ -51,7 +51,7 @@ function HeroSection() {
               <span className="bg-gradient-to-r from-[#7C3AED] to-[#06B6D4] bg-clip-text text-transparent">Build.</span>
             </motion.h1>
             <motion.p initial={reduce ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="mt-5 text-lg text-slate-600 max-w-[50ch] leading-relaxed">
-              Premium courses with interactive sandboxes, AI tutoring, and real-world projects. From bootcamp to FAANG in months, not years.
+              Courses with interactive sandboxes, AI tutoring, and real-world projects. Learn at your own pace and pay only for the courses you pick.
             </motion.p>
             <motion.div initial={reduce ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }} className="mt-8 flex flex-wrap gap-4">
               <button onClick={() => navigate("courses")} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#7C3AED] text-white font-semibold hover:bg-[#6D28D9] transition-colors shadow-lg shadow-[#7C3AED]/20 cursor-pointer">
@@ -62,20 +62,20 @@ function HeroSection() {
               </button>
             </motion.div>
             <motion.div initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="mt-10 flex flex-wrap gap-6 text-sm text-slate-500">
-              <span className="flex items-center gap-1.5"><Users size={16} className="text-[#7C3AED]" /> 45k+ engineers</span>
-              <span className="flex items-center gap-1.5"><Star size={16} className="text-amber-400 fill-amber-400" /> 4.9 avg rating</span>
-              <span className="flex items-center gap-1.5"><Check size={16} className="text-emerald-500" /> 98% satisfaction</span>
+              <span className="flex items-center gap-1.5"><Users size={16} className="text-[#7C3AED]" /> Pay per course in ETB</span>
+              <span className="flex items-center gap-1.5"><Brain size={16} className="text-[#7C3AED]" /> AI tutor in every lesson</span>
+              <span className="flex items-center gap-1.5"><Check size={16} className="text-emerald-500" /> Verifiable certificates</span>
             </motion.div>
           </div>
           <motion.div initial={reduce ? false : { opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="relative hidden lg:block">
-            <div className="bg-slate-900 rounded-2xl p-6 shadow-2xl shadow-[#7C3AED]/10 border border-slate-700/50">
+            <div className="bg-gradient-to-br from-[#2E1065] via-[#4C1D95] to-[#5B21B6] rounded-2xl p-6 shadow-2xl shadow-[#7C3AED]/30 border border-white/10">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-3 h-3 rounded-full bg-red-400" />
-                <div className="w-3 h-3 rounded-full bg-amber-400" />
-                <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                <span className="ml-3 text-xs text-slate-400 font-mono">agent.ts</span>
+                <div className="w-3 h-3 rounded-full bg-white/30" />
+                <div className="w-3 h-3 rounded-full bg-white/20" />
+                <div className="w-3 h-3 rounded-full bg-white/10" />
+                <span className="ml-3 text-xs text-violet-200/70 font-mono">agent.ts</span>
               </div>
-              <div className="text-sm font-mono leading-relaxed overflow-x-auto">
+              <div className="text-sm font-mono leading-relaxed overflow-x-auto text-violet-100">
                 {codeLines.map((line, i) => (
                   <div key={i} className="min-h-[1.5em]">
                     {line.parts.map((p, j) => (
@@ -86,7 +86,7 @@ function HeroSection() {
               </div>
             </div>
             <div className="absolute -top-4 -right-4 bg-white rounded-xl px-4 py-2 shadow-lg border border-slate-100">
-              <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1"><Check size={12} /> AI Tutor Active</span>
+              <span className="text-xs font-semibold text-[#5B21B6] flex items-center gap-1"><Check size={12} className="text-emerald-500" /> AI Tutor Active</span>
             </div>
           </motion.div>
         </div>

@@ -5,6 +5,7 @@ import { Search, Bookmark, GraduationCap, Menu, X, ChevronDown, LogOut, User, Re
 import { useApp } from "@/hooks/useApp"
 import { useNotifications } from "@/hooks/queries"
 import { ConfirmDialog } from "@/components/ConfirmDialog"
+import { Logo } from "@/components/Logo"
 
 const NAV_LINKS = [
   { label: "Home", to: "/", end: true },
@@ -42,12 +43,7 @@ export function Navbar() {
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:bg-white focus:px-3 focus:py-2 focus:rounded-lg">Skip to content</a>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2" aria-label="Devora home">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] flex items-center justify-center">
-              <span className="text-white font-bold text-sm">D</span>
-            </div>
-            <span className="text-xl font-bold text-slate-900 tracking-tight">DEVORA</span>
-          </Link>
+          <Link to="/" aria-label="Devora home"><Logo /></Link>
 
           <div className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map(l => <NavLink key={l.to} to={l.to} end={l.end} className={linkClass}>{l.label}</NavLink>)}
@@ -163,10 +159,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] flex items-center justify-center"><span className="text-white font-bold text-sm">D</span></div>
-              <span className="text-lg font-bold text-white">DEVORA</span>
-            </div>
+            <div className="mb-4"><Logo textClass="text-lg font-bold text-white" /></div>
             <p className="text-sm text-slate-400 leading-relaxed">Learn. Practice. Build.<br />Courses you can buy one by one, in ETB.</p>
           </div>
           <div>
