@@ -11,6 +11,8 @@ export const meApi = {
   notifications: () => request<AppNotification[]>("/me/notifications"),
   markNotificationRead: (id: string) => request<void>(`/me/notifications/${id}/read`, { method: "POST" }),
   markAllNotificationsRead: () => request<void>("/me/notifications/read-all", { method: "POST" }),
+  deleteNotification: (id: string) => request<void>(`/me/notifications/${id}`, { method: "DELETE" }),
+  deleteAllNotifications: () => request<void>("/me/notifications", { method: "DELETE" }),
   payments: () => request<Payment[]>("/me/payments"),
   tutorChat: (body: { courseId: string; lessonId: string; messages: TutorMessage[] }) => request<{ reply: string }>("/ai-tutor/chat", { method: "POST", body }),
 }

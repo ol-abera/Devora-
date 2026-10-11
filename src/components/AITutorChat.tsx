@@ -99,13 +99,14 @@ export function AITutorChat({ courseId, lessonId, lessonTitle }: AITutorChatProp
     <>
       {/* Floating trigger */}
       <button
+        type="button"
         onClick={() => setOpen(true)}
         aria-label="Open AI tutor"
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-[#7C3AED] text-white font-medium shadow-lg shadow-[#7C3AED]/30 hover:bg-[#6D28D9] transition-all cursor-pointer"
+        className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 pl-3.5 pr-4 py-2.5 rounded-full bg-[#7C3AED] text-white font-semibold text-sm shadow-lg shadow-violet-600/40 hover:bg-[#6D28D9] hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer"
       >
-        <Brain size={18} />
-        <span className="hidden sm:inline text-sm">AI Tutor</span>
-        <Sparkles size={14} className="opacity-80" />
+        <Brain size={18} className="shrink-0" />
+        <span>AI Tutor</span>
+        <Sparkles size={14} className="text-violet-200 shrink-0" />
       </button>
 
       {/* Chat panel */}

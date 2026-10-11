@@ -6,6 +6,16 @@
     <meta name="theme-color" content="#7C3AED" />
     <meta name="description" content="Devora courses for Ethiopian students. Buy individual courses in ETB with Chapa." />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script>
+      /* Apply the saved (or device) theme before first paint so there is no white flash in dark mode. */
+      (function () {
+        try {
+          var t = localStorage.getItem("devora_theme");
+          if (t !== "dark" && t !== "light") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          if (t === "dark") { document.documentElement.classList.add("dark"); document.documentElement.style.colorScheme = "dark"; }
+        } catch (e) {}
+      })();
+    </script>
     <title>Devora — Learn. Practice. Build.</title>
   </head>
   <body>

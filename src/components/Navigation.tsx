@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react"
 import { Link, NavLink } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
-import { Search, Bookmark, GraduationCap, Menu, X, ChevronDown, LogOut, User, Receipt, Settings, Bell, LayoutDashboard, Brain } from "lucide-react"
+import { Search, Bookmark, GraduationCap, Menu, X, ChevronDown, LogOut, User, Receipt, Settings, Bell, LayoutDashboard } from "lucide-react"
 import { useApp } from "@/hooks/useApp"
 import { useNotifications } from "@/hooks/queries"
 import { ConfirmDialog } from "@/components/ConfirmDialog"
 import { Logo } from "@/components/Logo"
 import { LanguageSelector } from "@/components/LanguageSelector"
+import { ThemeToggle } from "@/components/ThemeToggle"
 import { useI18n } from "@/i18n"
 
 export function Navbar() {
@@ -24,7 +25,6 @@ export function Navbar() {
     { label: t("nav.home"), to: "/", end: true },
     { label: t("nav.courses"), to: "/courses", end: false },
     { label: t("nav.playground"), to: "/playground", end: false },
-    { label: t("nav.tutor"), to: "/tutor", end: false },
   ]
 
   useEffect(() => {
@@ -58,6 +58,7 @@ export function Navbar() {
 
           <div className="flex items-center gap-1 sm:gap-2">
             <LanguageSelector />
+            <ThemeToggle />
 
             {searchOpen ? (
               <div className="relative">
@@ -111,7 +112,6 @@ export function Navbar() {
                         <Link role="menuitem" to="/bookmarks" onClick={() => setProfileOpen(false)} className={item}><Bookmark size={14} /> {t("nav.savedCourses")}</Link>
                         <Link role="menuitem" to="/purchases" onClick={() => setProfileOpen(false)} className={item}><Receipt size={14} /> {t("nav.purchases")}</Link>
                         <Link role="menuitem" to="/certificates" onClick={() => setProfileOpen(false)} className={item}><GraduationCap size={14} /> {t("nav.certificates")}</Link>
-                        <Link role="menuitem" to="/tutor" onClick={() => setProfileOpen(false)} className={item}><Brain size={14} /> {t("nav.tutor")}</Link>
                         <Link role="menuitem" to="/settings" onClick={() => setProfileOpen(false)} className={item}><Settings size={14} /> {t("nav.settings")}</Link>
                         <button role="menuitem" onClick={() => { setProfileOpen(false); setConfirmLogout(true) }} className={`${item} text-red-600`}><LogOut size={14} /> {t("nav.signOut")}</button>
                       </motion.div>
@@ -165,7 +165,7 @@ export function Footer() {
   const col = "space-y-2 text-sm"
   const link = "hover:text-white transition-colors"
   return (
-    <footer className="bg-slate-900 text-slate-300">
+    <footer className="theme-light bg-slate-900 text-slate-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
           <div className="col-span-2 md:col-span-1">
@@ -177,7 +177,6 @@ export function Footer() {
             <ul className={col}>
               <li><Link to="/courses" className={link}>{t("footer.allCourses")}</Link></li>
               <li><Link to="/playground" className={link}>{t("footer.playground")}</Link></li>
-              <li><Link to="/tutor" className={link}>{t("nav.tutor")}</Link></li>
               <li><Link to="/verify" className={link}>{t("footer.verify")}</Link></li>
             </ul>
           </div>

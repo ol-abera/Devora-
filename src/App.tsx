@@ -14,6 +14,7 @@ import CodingPlayground from "@/components/CodingPlayground"
 import InstructorDashboard from "@/components/InstructorDashboard"
 import CourseBuilder from "@/components/instructor/CourseBuilder"
 import AdminDashboard from "@/components/AdminDashboard"
+import { FloatingAITutor } from "@/components/FloatingAITutor"
 import { CheckoutPage } from "@/components/payments/CheckoutPage"
 import { PaymentReturnPage } from "@/components/payments/PaymentReturnPage"
 import { PurchaseHistoryPage } from "@/components/payments/PurchaseHistoryPage"
@@ -27,6 +28,7 @@ import AITutorPage from "@/pages/AITutorPage"
 import { PageShell, LinkButton } from "@/components/ui"
 import { useSyncLocaleFromProfile } from "@/i18n"
 import { useAuth } from "@/context/AuthContext"
+import { useTheme } from "@/context/ThemeContext"
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -48,6 +50,7 @@ function Layout() {
       <Navbar />
       <div id="main"><Outlet /></div>
       <Footer />
+      <FloatingAITutor />
     </>
   )
 }
@@ -65,6 +68,7 @@ function NotFound() {
 }
 
 export default function App() {
+  const { theme } = useTheme()
   return (
     <>
       <Routes>
@@ -112,7 +116,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
-      <Toaster position="top-right" richColors closeButton />
+      <Toaster position="top-right" richColors closeButton theme={theme} />
     </>
   )
 }

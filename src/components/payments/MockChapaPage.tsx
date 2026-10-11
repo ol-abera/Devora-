@@ -34,7 +34,7 @@ export function MockChapaPage() {
   }
 
   return (
-    <main className="pt-24 pb-20 min-h-screen bg-[#0F172A]">
+    <main className="theme-light pt-24 pb-20 min-h-screen bg-[#0F172A]">
       <div className="max-w-lg mx-auto px-4">
         <div className="text-center text-white mb-6">
           <p className="text-xs uppercase tracking-[0.25em] text-emerald-300">Chapa checkout (demo)</p>

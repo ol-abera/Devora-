@@ -467,6 +467,16 @@ route("POST", "/me/notifications/([^/]+)/read", {}, ({ db, user, params }) => {
   const n = db.notifications.find(x => x.id === params[0] && x.userId === need(user).id)
   if (n) n.read = true
 })
+route("DELETE", "/me/notifications/([^/]+)", {}, ({ db, user, params }) => {
+  const u = need(user)
+  const idx = db.notifications.findIndex(x => x.id === params[0] && x.userId === u.id)
+  if (idx < 0) throw new ApiError(404, "Notification not found.", "NOT_FOUND")
+  db.notifications.splice(idx, 1)
+})
+route("DELETE", "/me/notifications", {}, ({ db, user }) => {
+  const u = need(user)
+  db.notifications = db.notifications.filter(n => n.userId !== u.id)
+})
 route("POST", "/ai-tutor/chat", {}, ({ user, body }) => {
   need(user)
   const courseId = String(body?.courseId ?? "")

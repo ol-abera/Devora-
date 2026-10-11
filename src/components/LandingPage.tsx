@@ -13,81 +13,107 @@ const iconMap: Record<string, React.ReactNode> = {
   Palette: <Sparkles size={20} />, Smartphone: <Play size={20} />, Cloud: <Zap size={20} />,
 }
 
-const codeLines = [
-  { parts: [{ t: "import", c: "text-violet-300" }, { t: " { Agent } ", c: "" }, { t: "from", c: "text-violet-300" }, { t: " ", c: "" }, { t: `"@devora/ai"`, c: "text-cyan-300" }] },
-  { parts: [] },
-  { parts: [{ t: "const", c: "text-violet-300" }, { t: " ", c: "" }, { t: "tutor", c: "text-white" }, { t: " = ", c: "" }, { t: "new", c: "text-violet-300" }, { t: " ", c: "" }, { t: "Agent", c: "text-violet-200" }, { t: "({", c: "" }] },
-  { parts: [{ t: "  model: ", c: "" }, { t: `"devora-7b"`, c: "text-cyan-300" }, { t: ",", c: "" }] },
-  { parts: [{ t: "  mode: ", c: "" }, { t: `"socratic"`, c: "text-cyan-300" }, { t: ",", c: "" }] },
-  { parts: [{ t: "  hints: ", c: "" }, { t: "true", c: "text-amber-300" }, { t: ",", c: "" }] },
-  { parts: [{ t: "})", c: "" }] },
-  { parts: [] },
-  { parts: [{ t: "const", c: "text-violet-300" }, { t: " ", c: "" }, { t: "solution", c: "text-white" }, { t: " = ", c: "" }, { t: "await", c: "text-violet-300" }, { t: " tutor.", c: "" }, { t: "explain", c: "text-violet-200" }, { t: "({", c: "" }] },
-  { parts: [{ t: "  concept: ", c: "" }, { t: `"closures"`, c: "text-cyan-300" }, { t: ",", c: "" }] },
-  { parts: [{ t: "  level: ", c: "" }, { t: `"intermediate"`, c: "text-cyan-300" }, { t: ",", c: "" }] },
-  { parts: [{ t: "})", c: "" }] },
-  { parts: [{ t: `// → 3 hints, 1 exercise, 0 spoilers`, c: "text-violet-300/50" }] },
-]
-
 function HeroSection() {
   const { navigate } = useApp()
   const reduce = useReducedMotion()
 
   return (
-    <section className="relative min-h-[100dvh] flex items-center pt-16 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#F8F7FC] via-white to-[#EDE9FE]" />
-      <div className="absolute top-20 right-10 w-72 h-72 bg-[#7C3AED]/8 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 left-10 w-96 h-96 bg-[#06B6D4]/6 rounded-full blur-3xl" />
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+    <section className="theme-light relative min-h-[92dvh] flex items-center pt-20 overflow-hidden">
+      {/* Soft mesh background */}
+      <div className="absolute inset-0 bg-[#0B1020]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_20%,rgba(124,58,237,0.35),transparent_55%),radial-gradient(ellipse_at_80%_10%,rgba(6,182,212,0.25),transparent_50%),radial-gradient(ellipse_at_50%_100%,rgba(124,58,237,0.2),transparent_45%)]" />
+      <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div>
-            <motion.div initial={reduce ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#EDE9FE] text-[#5B21B6] text-xs font-semibold mb-6">
-                <Sparkles size={14} /> Courses you buy one by one, in ETB
+            <motion.div initial={reduce ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-violet-200 text-xs font-semibold mb-6 backdrop-blur-sm">
+                <Sparkles size={14} className="text-cyan-300" /> Built for Ethiopian students · Pay in ETB
               </span>
             </motion.div>
-            <motion.h1 initial={reduce ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.08]">
-              Learn. Practice.<br />
-              <span className="bg-gradient-to-r from-[#7C3AED] to-[#06B6D4] bg-clip-text text-transparent">Build.</span>
+            <motion.h1
+              initial={reduce ? false : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.08 }}
+              className="text-4xl sm:text-5xl lg:text-[3.4rem] font-extrabold tracking-tight text-white leading-[1.1]"
+            >
+              Master tech skills
+              <br />
+              <span className="bg-gradient-to-r from-violet-300 via-fuchsia-300 to-cyan-300 bg-clip-text text-transparent">
+                that open careers
+              </span>
             </motion.h1>
-            <motion.p initial={reduce ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="mt-5 text-lg text-slate-600 max-w-[50ch] leading-relaxed">
-              Courses with interactive sandboxes, AI tutoring, and real-world projects. Learn at your own pace and pay only for the courses you pick.
+            <motion.p
+              initial={reduce ? false : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.16 }}
+              className="mt-5 text-lg text-slate-300 max-w-[48ch] leading-relaxed"
+            >
+              Hands-on courses in English, with Amharic and Afaan Oromo support. Practice in a safe coding playground, get help from AI Tutor, and earn verifiable certificates.
             </motion.p>
-            <motion.div initial={reduce ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }} className="mt-8 flex flex-wrap gap-4">
-              <button onClick={() => navigate("courses")} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#7C3AED] text-white font-semibold hover:bg-[#6D28D9] transition-colors shadow-lg shadow-[#7C3AED]/20 cursor-pointer">
-                Start Learning <ArrowRight size={18} />
+            <motion.div
+              initial={reduce ? false : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.24 }}
+              className="mt-8 flex flex-wrap gap-3"
+            >
+              <button
+                onClick={() => navigate("courses")}
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#7C3AED] text-white font-semibold hover:bg-[#6D28D9] transition-colors shadow-lg shadow-violet-900/40 cursor-pointer"
+              >
+                Browse courses <ArrowRight size={18} />
               </button>
-              <button onClick={() => navigate("courses")} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:border-[#7C3AED] hover:text-[#7C3AED] transition-colors cursor-pointer">
-                Explore Courses
+              <button
+                onClick={() => navigate("playground")}
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/15 transition-colors cursor-pointer backdrop-blur-sm"
+              >
+                <Code2 size={18} /> Try the playground
               </button>
             </motion.div>
-            <motion.div initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="mt-10 flex flex-wrap gap-6 text-sm text-slate-500">
-              <span className="flex items-center gap-1.5"><Users size={16} className="text-[#7C3AED]" /> Pay per course in ETB</span>
-              <span className="flex items-center gap-1.5"><Brain size={16} className="text-[#7C3AED]" /> AI tutor in every lesson</span>
-              <span className="flex items-center gap-1.5"><Check size={16} className="text-emerald-500" /> Verifiable certificates</span>
-            </motion.div>
+            <motion.ul
+              initial={reduce ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.35 }}
+              className="mt-10 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-400"
+            >
+              {["Chapa payments in ETB", "AI Tutor in every lesson", "Verified certificates"].map(item => (
+                <li key={item} className="flex items-center gap-1.5">
+                  <Check size={14} className="text-emerald-400 shrink-0" /> {item}
+                </li>
+              ))}
+            </motion.ul>
           </div>
-          <motion.div initial={reduce ? false : { opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="relative hidden lg:block">
-            <div className="bg-gradient-to-br from-[#2E1065] via-[#4C1D95] to-[#5B21B6] rounded-2xl p-6 shadow-2xl shadow-[#7C3AED]/30 border border-white/10">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-3 h-3 rounded-full bg-white/30" />
-                <div className="w-3 h-3 rounded-full bg-white/20" />
-                <div className="w-3 h-3 rounded-full bg-white/10" />
-                <span className="ml-3 text-xs text-violet-200/70 font-mono">agent.ts</span>
-              </div>
-              <div className="text-sm font-mono leading-relaxed overflow-x-auto text-violet-100">
-                {codeLines.map((line, i) => (
-                  <div key={i} className="min-h-[1.5em]">
-                    {line.parts.map((p, j) => (
-                      <span key={j} className={p.c}>{p.t}</span>
-                    ))}
+
+          {/* Hero visual */}
+          <motion.div
+            initial={reduce ? false : { opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.55, delay: 0.15 }}
+            className="relative"
+          >
+            <div className="relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl shadow-violet-950/50 aspect-[4/3] bg-slate-900">
+              <img
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80"
+                alt="Students collaborating on coding projects"
+                className="absolute inset-0 w-full h-full object-cover opacity-90"
+                loading="eager"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0B1020] via-[#0B1020]/40 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#7C3AED] flex items-center justify-center shadow-lg">
+                    <Brain size={20} className="text-white" />
                   </div>
-                ))}
+                  <div>
+                    <p className="text-white font-semibold text-sm">Learn by building</p>
+                    <p className="text-slate-300 text-xs">Projects, quizzes, and AI guidance</p>
+                  </div>
+                </div>
+                
               </div>
             </div>
-            <div className="absolute -top-4 -right-4 bg-white rounded-xl px-4 py-2 shadow-lg border border-slate-100">
-              <span className="text-xs font-semibold text-[#5B21B6] flex items-center gap-1"><Check size={12} className="text-emerald-500" /> AI Tutor Active</span>
-            </div>
+           
           </motion.div>
         </div>
       </div>
@@ -193,7 +219,7 @@ function WhyDevora() {
 function AITutorShowcase() {
   const [showHint, setShowHint] = useState(false)
   return (
-    <section className="py-20 bg-[#0F172A] text-white">
+    <section className="theme-light py-20 bg-[#0F172A] text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
@@ -255,21 +281,6 @@ function FAQSection() {
   )
 }
 
-function CTASection() {
-  const { navigate } = useApp()
-  return (
-    <section className="py-20 bg-gradient-to-br from-[#4C1D95] via-[#7C3AED] to-[#5B21B6] text-white">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold mb-4">Ready to level up your engineering career?</h2>
-        <p className="text-white/70 text-lg mb-8 max-w-[50ch] mx-auto">Practice over theory. Pick a course, pay with Chapa, and start building real projects today.</p>
-        <button onClick={() => navigate("courses")} className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-white text-[#7C3AED] font-bold text-lg hover:bg-[#EDE9FE] transition-colors shadow-xl cursor-pointer">
-          Get Started Free <ArrowRight size={20} />
-        </button>
-      </div>
-    </section>
-  )
-}
-
 export function LandingPage() {
   return (
     <main>
@@ -279,7 +290,6 @@ export function LandingPage() {
       <WhyDevora />
       <AITutorShowcase />
       <FAQSection />
-      <CTASection />
     </main>
   )
 }
