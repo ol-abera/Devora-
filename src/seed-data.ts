@@ -277,6 +277,7 @@ export interface SeedLessonContent {
   body: string
   codeSnippet?: string
   language?: string
+  explanations?: { am?: string; om?: string }
   quiz?: { question: string; options: string[]; correct: number }[]
   exercises?: string[]
   keyTakeaways: string[]
@@ -287,11 +288,19 @@ export const lessonContents: Record<string, SeedLessonContent> = {
     body: "Generics allow you to write reusable, type-safe code. This lesson covers conditional types, the infer keyword, and recursive generics that power modern TypeScript libraries.",
     codeSnippet: `type Unwrap<T> = T extends Promise<infer U> ? Unwrap<U> : T;`,
     language: "typescript",
+    explanations: {
+      am: "ጄኔሪክስ እንደገና ጥቅም ላይ የሚውል እና የአይነት-ደህንነት ያለው ኮድ ለመጻፍ ያስችላሉ። ይህ ትምህርት የሁኔታዊ አይነቶችን፣ የinfer ቁልፍ ቃልን እና ተደጋጋሚ ጄኔሪክስን ይሸፍናል።",
+      om: "Generics koodii irra deebi'amee fayyadamuu danda'u fi type-safe ta'e barreessuuf isin dandeessisu. Barumsi kun conditional types, jecha iccitii infer, fi recursive generics ni hammata.",
+    },
     keyTakeaways: ["Conditional types use extends to branch", "infer extracts types from constraints", "Recursive generics unwrap nested Promises"],
     exercises: ["Create a DeepPartial<T> utility", "Build a Flatten<T> type"],
   },
   l2: {
     body: "Mapped types transform every property in a type, while template literal types enable string manipulation at the type level.",
+    explanations: {
+      am: "Mapped types በአንድ አይነት ውስጥ ያለውን እያንዳንዱን ንብረት ይለውጣሉ። Template literal types በአይነት ደረጃ የጽሑፍ ማሻሻያ ያስችላሉ።",
+      om: "Mapped types qabiyyee type keessaa hunda jijjiiru. Template literal types fooyya'insa barreeffamaa sadarkaa type irratti dandeessisu.",
+    },
     codeSnippet: `type EventName<T extends string> = \`on\${Capitalize<T>}\`;`,
     language: "typescript",
     keyTakeaways: ["Mapped types iterate over union keys", "Template literals enable type-level strings", "Capitalize/Lowercase/Uppercase are built-in"],
@@ -311,6 +320,10 @@ export const lessonContents: Record<string, SeedLessonContent> = {
   },
   l5: {
     body: "React Server Components run on the server, enabling direct DB access without exposing secrets and reducing client bundle size.",
+    explanations: {
+      am: "React Server Components በሰርቨር ላይ ይሰራሉ። ቀጥተኛ የDB መዳረሻ ሳይገልጡ ሚስጥሮችን ያስችላሉ እና የደንበኛ ጥቅል መጠንን ይቀንሳሉ።",
+      om: "React Server Components server irratti ni dalagu. DB qaqqabuu kallattii iccitii hin saaxiluuf dandeessisu; bal'ina client bundle ni hir'isu.",
+    },
     codeSnippet: `export default async function Dashboard() { const stats = await db.query("SELECT 1"); return <div>{stats}</div>; }`,
     language: "typescript",
     keyTakeaways: ["Server Components can be async", "They reduce client bundle", "Use 'use client' only for interactivity"],

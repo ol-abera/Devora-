@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 import { toast } from "sonner"
 import { Award, Printer, Link2, ArrowLeft } from "lucide-react"
 import { useCertificates } from "@/hooks/queries"
-import { ErrorState, Spinner } from "@/components/ui"
+import { ErrorState, SkeletonCards } from "@/components/ui"
 import { CertificateCard } from "@/components/CertificateCard"
 
 export default function CertificatesPage() {
@@ -33,7 +33,7 @@ export default function CertificatesPage() {
           <p className="text-gray-500 mt-1">Verified credentials for completed courses</p>
         </div>
 
-        {isLoading ? <Spinner label="Loading certificates" /> : isError ? <ErrorState message={error.message} onRetry={() => refetch()} /> : certificates.length === 0 ? (
+        {isLoading ? <SkeletonCards count={2} /> : isError ? <ErrorState message={error.message} onRetry={() => refetch()} /> : certificates.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-16 h-16 mx-auto rounded-full bg-purple-100 flex items-center justify-center mb-4"><Award size={28} className="text-purple-600" /></div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No certificates yet</h3>

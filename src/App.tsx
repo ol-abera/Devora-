@@ -12,6 +12,8 @@ import BookmarksPage from "@/components/BookmarksPage"
 import CertificatesPage from "@/components/CertificatesPage"
 import CodingPlayground from "@/components/CodingPlayground"
 import InstructorDashboard from "@/components/InstructorDashboard"
+import CourseBuilder from "@/components/instructor/CourseBuilder"
+import AdminDashboard from "@/components/AdminDashboard"
 import { CheckoutPage } from "@/components/payments/CheckoutPage"
 import { PaymentReturnPage } from "@/components/payments/PaymentReturnPage"
 import { PurchaseHistoryPage } from "@/components/payments/PurchaseHistoryPage"
@@ -21,7 +23,10 @@ import { ForgotPasswordPage, LoginPage, RegisterPage, ResetPasswordPage } from "
 import SettingsPage from "@/pages/SettingsPage"
 import NotificationsPage from "@/pages/NotificationsPage"
 import VerifyCertificatePage from "@/pages/VerifyCertificatePage"
+import AITutorPage from "@/pages/AITutorPage"
 import { PageShell, LinkButton } from "@/components/ui"
+import { useSyncLocaleFromProfile } from "@/i18n"
+import { useAuth } from "@/context/AuthContext"
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -29,9 +34,16 @@ function ScrollToTop() {
   return null
 }
 
+function LocaleSync() {
+  const { user } = useAuth()
+  useSyncLocaleFromProfile(user?.locale)
+  return null
+}
+
 function Layout() {
   return (
     <>
+      <LocaleSync />
       <ScrollToTop />
       <Navbar />
       <div id="main"><Outlet /></div>
@@ -74,6 +86,7 @@ export default function App() {
           <Route element={<RequireAuth />}>
             <Route path="dashboard" element={<StudentDashboard />} />
             <Route path="playground" element={<CodingPlayground />} />
+            <Route path="tutor" element={<AITutorPage />} />
             <Route path="bookmarks" element={<BookmarksPage />} />
             <Route path="certificates" element={<CertificatesPage />} />
             <Route path="purchases" element={<PurchaseHistoryPage />} />
@@ -87,6 +100,12 @@ export default function App() {
           {/* instructor */}
           <Route element={<RequireAuth roles={["instructor", "admin"]} />}>
             <Route path="instructor" element={<InstructorDashboard />} />
+            <Route path="instructor/courses/new" element={<CourseBuilder />} />
+            <Route path="instructor/courses/:courseId/edit" element={<CourseBuilder />} />
+          </Route>
+
+          <Route element={<RequireAuth roles={["admin"]} />}>
+            <Route path="admin" element={<AdminDashboard />} />
           </Route>
 
           <Route path="home" element={<Navigate to="/" replace />} />

@@ -12,6 +12,8 @@ const VIEW_PATHS = {
   "student-dashboard": "/dashboard",
   "instructor-dashboard": "/instructor",
   playground: "/playground",
+  tutor: "/tutor",
+  admin: "/admin",
   certificates: "/certificates",
   bookmarks: "/bookmarks",
   purchases: "/purchases",

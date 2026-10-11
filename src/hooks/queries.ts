@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { authApi, coursesApi, instructorApi, meApi, paymentsApi } from "@/api"
+import { adminApi, authApi, coursesApi, instructorApi, meApi, paymentsApi } from "@/api"
 import type { CourseQuery } from "@/api"
 import { useAuth } from "@/context/AuthContext"
 
@@ -18,6 +18,18 @@ export const keys = {
   payment: (txRef: string) => ["payment", txRef] as const,
   challenges: ["playground"] as const,
   instructorStats: ["instructor", "stats"] as const,
+  instructorCourses: ["instructor", "courses"] as const,
+  instructorCourse: (id: string) => ["instructor", "course", id] as const,
+  instructorStudents: ["instructor", "students"] as const,
+  instructorRevenue: ["instructor", "revenue"] as const,
+  adminOverview: ["admin", "overview"] as const,
+  adminUsers: ["admin", "users"] as const,
+  adminPendingCourses: ["admin", "courses", "pending"] as const,
+  adminCourses: ["admin", "courses"] as const,
+  adminTransactions: ["admin", "transactions"] as const,
+  adminReports: ["admin", "reports"] as const,
+  adminTickets: ["admin", "tickets"] as const,
+  adminAudit: ["admin", "audit"] as const,
 }
 
 export const useCategories = () => useQuery({ queryKey: keys.categories, queryFn: coursesApi.categories, staleTime: 5 * 60_000 })
@@ -45,6 +57,14 @@ export const useNotifications = () => {
 }
 export const usePayment = (txRef: string | undefined) => useQuery({ queryKey: keys.payment(txRef ?? ""), queryFn: () => paymentsApi.get(txRef!), enabled: !!txRef })
 export const useInstructorStats = () => useQuery({ queryKey: keys.instructorStats, queryFn: instructorApi.stats })
+export const useInstructorCourses = () => useQuery({ queryKey: keys.instructorCourses, queryFn: instructorApi.courses })
+export const useInstructorCourse = (id: string | undefined) => useQuery({
+  queryKey: keys.instructorCourse(id ?? ""),
+  queryFn: () => instructorApi.getCourse(id!),
+  enabled: !!id,
+})
+export const useInstructorStudents = () => useQuery({ queryKey: keys.instructorStudents, queryFn: instructorApi.students })
+export const useInstructorRevenue = () => useQuery({ queryKey: keys.instructorRevenue, queryFn: instructorApi.revenue })
 
 /* ---- mutations ---- */
 export function useInvalidateMe() {
@@ -75,3 +95,14 @@ export function useUpdateProfile() {
   const { setUser } = useAuth()
   return useMutation({ mutationFn: authApi.updateProfile, onSuccess: profile => setUser(profile) })
 }
+
+
+/* ---- admin (role admin only; API enforces) ---- */
+export const useAdminOverview = () => useQuery({ queryKey: keys.adminOverview, queryFn: adminApi.overview })
+export const useAdminUsers = () => useQuery({ queryKey: keys.adminUsers, queryFn: () => adminApi.users() })
+export const useAdminPendingCourses = () => useQuery({ queryKey: keys.adminPendingCourses, queryFn: adminApi.pendingCourses })
+export const useAdminCourses = () => useQuery({ queryKey: keys.adminCourses, queryFn: adminApi.allCourses })
+export const useAdminTransactions = () => useQuery({ queryKey: keys.adminTransactions, queryFn: adminApi.transactions })
+export const useAdminReports = () => useQuery({ queryKey: keys.adminReports, queryFn: adminApi.reports })
+export const useAdminTickets = () => useQuery({ queryKey: keys.adminTickets, queryFn: adminApi.tickets })
+export const useAdminAudit = () => useQuery({ queryKey: keys.adminAudit, queryFn: adminApi.audit })

@@ -8,6 +8,7 @@ import { useApp } from "@/hooks/useApp"
 import { useCompleteLesson, useCourse, useEnrollments, useLesson } from "@/hooks/queries"
 import { ErrorState, PageShell, Spinner } from "@/components/ui"
 import { AITutorChat } from "./AITutorChat"
+import { useI18n } from "@/i18n"
 
 export default function CourseLearningPage() {
   const { courseId, lessonId } = useParams()
@@ -20,6 +21,7 @@ export default function CourseLearningPage() {
   const [answers, setAnswers] = useState<number[]>([])
   const [result, setResult] = useState<QuizResult | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const { locale, t } = useI18n()
 
   // New lesson = fresh quiz
   useEffect(() => { setAnswers([]); setResult(null) }, [lessonId])
@@ -130,6 +132,36 @@ export default function CourseLearningPage() {
               <div className="space-y-4">
                 <div className="bg-white rounded-xl border border-gray-100 p-6">
                   <p className="text-gray-700 leading-relaxed">{content.body}</p>
+                  {content.explanations && (content.explanations.am || content.explanations.om) && (
+                    <div className="mt-4 rounded-lg border border-[#EDE9FE] bg-[#F8F7FC] p-4 space-y-3">
+                      <p className="text-xs font-semibold text-[#5B21B6] uppercase tracking-wide">{t("lesson.localExplanations")}</p>
+                      {content.explanations.am && (locale === "am" || locale === "en") && (
+                        <div>
+                          <p className="text-xs text-slate-400 mb-1">አማርኛ</p>
+                          <p className="text-sm text-slate-700 leading-relaxed" lang="am">{content.explanations.am}</p>
+                        </div>
+                      )}
+                      {content.explanations.om && (locale === "om" || locale === "en") && (
+                        <div>
+                          <p className="text-xs text-slate-400 mb-1">Afaan Oromoo</p>
+                          <p className="text-sm text-slate-700 leading-relaxed" lang="om">{content.explanations.om}</p>
+                        </div>
+                      )}
+                      {locale === "am" && !content.explanations.am && content.explanations.om && (
+                        <div>
+                          <p className="text-xs text-slate-400 mb-1">Afaan Oromoo</p>
+                          <p className="text-sm text-slate-700 leading-relaxed" lang="om">{content.explanations.om}</p>
+                        </div>
+                      )}
+                      {locale === "om" && !content.explanations.om && content.explanations.am && (
+                        <div>
+                          <p className="text-xs text-slate-400 mb-1">አማርኛ</p>
+                          <p className="text-sm text-slate-700 leading-relaxed" lang="am">{content.explanations.am}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {content.codeSnippet && (
                     <div className="mt-4 bg-gray-900 rounded-lg p-4 overflow-x-auto">
                       <div className="flex items-center justify-between mb-2"><span className="text-xs text-gray-400 font-mono">{content.language}</span><FileText size={14} className="text-gray-500" /></div>
@@ -140,14 +172,14 @@ export default function CourseLearningPage() {
 
                 {content.keyTakeaways.length > 0 && (
                   <div className="bg-amber-50 rounded-xl border border-amber-100 p-5">
-                    <h2 className="font-semibold text-amber-800 text-sm mb-3 flex items-center gap-2"><Lightbulb size={16} /> Key Takeaways</h2>
+                    <h2 className="font-semibold text-amber-800 text-sm mb-3 flex items-center gap-2"><Lightbulb size={16} /> {t("lesson.keyTakeaways")}</h2>
                     <ul className="space-y-1.5">{content.keyTakeaways.map((t, i) => <li key={i} className="text-sm text-amber-700 flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />{t}</li>)}</ul>
                   </div>
                 )}
 
                 {content.exercises && content.exercises.length > 0 && (
                   <div className="bg-blue-50 rounded-xl border border-blue-100 p-5">
-                    <h2 className="font-semibold text-blue-800 text-sm mb-3">Exercises</h2>
+                    <h2 className="font-semibold text-blue-800 text-sm mb-3">{t("lesson.exercises")}</h2>
                     <ul className="space-y-2">{content.exercises.map((ex, i) => <li key={i} className="text-sm text-blue-700 flex items-start gap-2"><span className="mt-0.5 text-xs font-bold text-blue-400">{i + 1}.</span>{ex}</li>)}</ul>
                   </div>
                 )}

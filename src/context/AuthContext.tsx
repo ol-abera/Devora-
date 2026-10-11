@@ -9,6 +9,8 @@ interface AuthState {
   loading: boolean
   login: (email: string, password: string) => Promise<Profile>
   register: (input: { name: string; email: string; password: string; role: "student" | "instructor" }) => Promise<Profile>
+  /** Sign in or sign up with a Google ID token verified by the backend. */
+  loginWithGoogle: (idToken: string, role?: "student" | "instructor") => Promise<Profile>
   logout: () => Promise<void>
   setUser: (user: Profile) => void
 }
@@ -49,6 +51,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     register: async input => {
       const res = await authApi.register(input)
+      tokenStore.set(res.token)
+      setUser(res.user)
+      return res.user
+    },
+    loginWithGoogle: async (idToken, role) => {
+      const res = await authApi.google({ idToken, role })
       tokenStore.set(res.token)
       setUser(res.user)
       return res.user

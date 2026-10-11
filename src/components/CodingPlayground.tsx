@@ -3,7 +3,45 @@ import { useApp } from "@/hooks/useApp"
 import { useChallenges } from "@/hooks/queries"
 import { ErrorState, Spinner } from "@/components/ui"
 import type { PlaygroundChallenge } from "@/api"
-import { Play, CheckCircle2, XCircle, RotateCcw, ChevronDown } from "lucide-react"
+import { Play, CheckCircle2, XCircle, RotateCcw, ChevronDown, Shield } from "lucide-react"
+
+/** Patterns that are not allowed in the playground (client-side guard; iframe is still sandboxed). */
+const BLOCKED = [
+  /\beval\s*\(/i,
+  /\bFunction\s*\(/i,
+  /document\.cookie/i,
+  /localStorage/i,
+  /sessionStorage/i,
+  /indexedDB/i,
+  /window\.parent/i,
+  /window\.top/i,
+  /window\.opener/i,
+  /<script[^>]+src\s*=/i, // external scripts
+  /fetch\s*\(/i,
+  /XMLHttpRequest/i,
+  /navigator\.serviceWorker/i,
+  /import\s*\(/i,
+  /\\bimport\b/i,
+]
+
+function findBlocked(code: string): string | null {
+  for (const re of BLOCKED) {
+    if (re.test(code)) return re.source
+  }
+  return null
+}
+
+function buildPreviewDoc(html: string, css: string, js: string): string {
+  // CSP: no network, no external scripts/styles; scripts only from this document
+  const csp = "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data: blob:; font-src data:; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+  return `<!DOCTYPE html><html><head><meta charset="utf-8" /><meta http-equiv="Content-Security-Policy" content="${csp}" /><style>${css}</style></head><body>${html}<script>
+try {
+${js}
+} catch (e) {
+  document.body.insertAdjacentHTML('beforeend', '<pre style="color:#b91c1c;font:12px monospace;padding:8px">'+String(e)+'</pre>');
+}
+</script></body></html>`
+}
 
 function Workspace({ challenges }: { challenges: PlaygroundChallenge[] }) {
   const { navigate } = useApp()
@@ -13,13 +51,24 @@ function Workspace({ challenges }: { challenges: PlaygroundChallenge[] }) {
   const [js, setJs] = useState(selectedChallenge.starterJs)
   const [results, setResults] = useState<{ name: string; passed: boolean }[] | null>(null)
   const [showPreview, setShowPreview] = useState(true)
+  const [blockedMsg, setBlockedMsg] = useState<string | null>(null)
 
   const [previewDoc, setPreviewDoc] = useState(`<!DOCTYPE html><html><head><style>${selectedChallenge.starterCss}</style></head><body>${selectedChallenge.starterHtml}<script>${selectedChallenge.starterJs}<\/script></body></html>`)
 
   const runCode = useCallback(() => {
-    setPreviewDoc(`<!DOCTYPE html><html><head><style>${css}</style></head><body>${html}<script>${js}<\/script></body></html>`)
+    setBlockedMsg(null)
+    const combined = `${html}
+${css}
+${js}`
+    const hit = findBlocked(combined)
+    if (hit) {
+      setBlockedMsg(`This code uses a restricted pattern (${hit}). The playground blocks eval, network access, storage, and external scripts for safety.`)
+      setResults(null)
+      return
+    }
+    setPreviewDoc(buildPreviewDoc(html, css, js))
 
-    // Run tests against the code
+    // Challenge checks are substring tests against the student code (not runtime eval of user tests)
     const testResults = selectedChallenge.tests.map(test => {
       const allCode = `${html} ${css} ${js}`
       const passed = allCode.includes(test.check)
@@ -51,7 +100,7 @@ function Workspace({ challenges }: { challenges: PlaygroundChallenge[] }) {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Coding Playground</h1>
-            <p className="text-gray-500 text-sm mt-1">Practice HTML, CSS, and JavaScript in a live sandbox</p>
+            <p className="text-gray-500 text-sm mt-1">Practice HTML, CSS, and JavaScript in a restricted live sandbox (no network or storage)</p>
           </div>
           <button onClick={() => navigate("student-dashboard")} className="text-sm text-purple-600 hover:text-purple-700 font-medium">
             Back to Dashboard
@@ -150,11 +199,19 @@ function Workspace({ challenges }: { challenges: PlaygroundChallenge[] }) {
                 <div className="px-3 py-2 border-b border-gray-100 bg-gray-50">
                   <span className="text-xs font-medium text-gray-500">Live Preview</span>
                 </div>
+                {blockedMsg && (
+                  <div role="alert" className="m-3 text-sm text-amber-800 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 flex gap-2">
+                    <Shield size={16} className="shrink-0 mt-0.5" />
+                    <span>{blockedMsg}</span>
+                  </div>
+                )}
                 <iframe
                   srcDoc={previewDoc}
                   title="Code preview"
                   className="w-full h-64 border-0 bg-white"
                   sandbox="allow-scripts"
+                  referrerPolicy="no-referrer"
+                  // no allow-same-origin: preview cannot access parent or storage
                 />
               </div>
             )}

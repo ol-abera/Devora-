@@ -18,11 +18,12 @@ While the backend is not ready, `VITE_USE_MOCK=true` runs a fake server in the b
 |---|---|---|---|
 | POST | `/auth/register` | `{ name, email, password(min 8), role: "student"\|"instructor" }` | `{ user: Profile, token }` (never allow `admin` here) |
 | POST | `/auth/login` | `{ email, password }` | `{ user: Profile, token }`; 401 wrong credentials; 403 suspended |
+| POST | `/auth/google` | `{ idToken, role?: "student"\|"instructor" }` | `{ user: Profile, token }`. Server **must** verify the Google ID token (aud, iss, exp, email_verified). Create account if email is new (default role student, or `role` if provided); link if email exists. Never trust client-only success. 400 INVALID_TOKEN; 403 suspended |
 | POST | `/auth/logout` | – | 204 |
 | GET | `/auth/me` | – | `Profile` |
 | POST | `/auth/forgot-password` | `{ email }` | `{ message }`. Always the same answer, whether or not the email exists. Email a link to `{FRONTEND_URL}/reset-password?token=...` |
 | POST | `/auth/reset-password` | `{ token, password }` | `{ message }`; 400 `INVALID_TOKEN` |
-| PATCH | `/me` | `{ name?, weeklyReminder?, weeklyGoal? }` | `Profile` |
+| PATCH | `/me` | `{ name?, weeklyReminder?, weeklyGoal?, locale?: "en"\|"am"\|"om" }` | `Profile` (includes optional `locale`) |
 
 `Profile` = `User` + `weeklyReminder`, `weeklyGoal`, `lessonsThisWeek` (lessons completed in the last 7 days, computed in SQL).
 
@@ -42,7 +43,7 @@ While the backend is not ready, `VITE_USE_MOCK=true` runs a fake server in the b
 |---|---|---|
 | GET | `/me/enrollments` | `Enrollment[]` with `progress`, `completedLessonIds`, `nextLesson`, `course` |
 | POST | `/courses/:courseId/enroll` | **Free courses only.** Paid course → 403 `PAYMENT_REQUIRED`. Returns `Enrollment` |
-| GET | `/courses/:courseId/lessons/:lessonId` | `LessonContent`. Allowed if the lesson is `preview`, or the user is enrolled. Otherwise 401/403. **Never include quiz answers.** |
+| GET | `/courses/:courseId/lessons/:lessonId` | `LessonContent`. Allowed if the lesson is `preview`, or the user is enrolled. Otherwise 401/403. **Never include quiz answers.** Optional `explanations: { am?, om? }` for local-language summaries; English `body` remains primary. |
 | POST | `/courses/:courseId/lessons/:lessonId/complete` | Returns updated `Enrollment`. When progress hits 100: create the certificate + a notification |
 | POST | `/courses/:courseId/lessons/:lessonId/quiz` | `{ answers: number[] }` → `QuizResult` (server grades; suggested pass mark 60%) |
 | GET | `/me/bookmarks` | `CourseSummary[]` |
@@ -51,7 +52,7 @@ While the backend is not ready, `VITE_USE_MOCK=true` runs a fake server in the b
 | GET | `/me/notifications` | `AppNotification[]`, newest first |
 | POST | `/me/notifications/:id/read` · `/me/notifications/read-all` | 204 |
 | GET | `/me/payments` | `Payment[]`, newest first |
-| POST | `/ai-tutor/chat` | `{ courseId, lessonId, messages: [{role,text}] }` → `{ reply }`. Call your AI provider here; keep the key on the server. Require enrollment. |
+| POST | `/ai-tutor/chat` | `{ courseId, lessonId, messages: [{role,text}] }` → `{ reply }`. Call your AI provider here; keep the key on the server. Require enrollment when `courseId`/`lessonId` are real lesson ids. Allow `courseId: "general"` / `lessonId: "general"` for the dedicated tutor page (signed-in users only). |
 
 ## Payments with Chapa (ETB)
 1. `POST /payments/chapa/initialize` body `{ courseId, fullName, email, phone }` (phone is `+2519XXXXXXXX`).
@@ -70,11 +71,39 @@ While the backend is not ready, `VITE_USE_MOCK=true` runs a fake server in the b
 Statuses: `pending | success | failed | cancelled`. The UI never unlocks a course on its own. It relies on lesson-endpoint authorisation (step "lessons") plus `accessGranted`.
 
 ## Instructor (role `instructor` or `admin`)
-| Method | Path | Returns |
+| Method | Path | Notes |
 |---|---|---|
 | GET | `/instructor/stats` | `InstructorStats` (revenue in ETB; month arrays have 12 numbers, Jan–Dec of this year) |
+| GET | `/instructor/courses` | `InstructorCourse[]` owned by the caller (admin may see all) |
+| GET | `/instructor/courses/:id` | Full builder payload (description, curriculum with lesson bodies/quizzes) |
+| POST | `/instructor/courses` | Body `CourseInput` → creates **draft** `InstructorCourse` |
+| PUT | `/instructor/courses/:id` | Body `CourseInput` → update; published courses become draft after edit |
+| POST | `/instructor/courses/:id/submit` | Submit draft/rejected for review. Mock auto-publishes; production should set `pending_review` until admin approves |
+| POST | `/instructor/courses/:id/unpublish` | Back to `draft` |
+| GET | `/instructor/students` | `InstructorStudent[]` for the instructor's courses |
+| GET | `/instructor/revenue` | `InstructorRevenueRow[]` successful payments on the instructor's courses |
 
-Course builder, quiz builder, instructor students/reviews/revenue, and the whole admin area are **not built in the UI yet**. Their request/response types are already drafted at the bottom of `src/api/types.ts` so the tables can be planned. The endpoints will be added to this document when the screens are built.
+Published instructor courses must appear in the public `GET /courses` catalog. Lesson bodies for those courses come from the stored curriculum (not seed data).
+
+## Admin (role `admin` only)
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/admin/overview` | `AdminOverview` |
+| GET | `/admin/users` | Query optional `search`, `role`, `status` → `AdminUserRow[]` |
+| POST | `/admin/users/:id/status` | `{ status: "active"\|"suspended" }` |
+| POST | `/admin/users/:id/role` | `{ role: "student"\|"instructor" }` (never promote to admin via this) |
+| GET | `/admin/courses/pending` | Courses with `pending_review` |
+| GET | `/admin/courses` | All instructor-created courses |
+| POST | `/admin/courses/:id/approve` | → `published` + notify owner |
+| POST | `/admin/courses/:id/reject` | `{ reason }` → `rejected` |
+| GET | `/admin/transactions` | `AdminTransaction[]` |
+| GET | `/admin/reports` | `AdminReport[]` |
+| POST | `/admin/reports/:id` | `{ status: "dismissed"\|"actioned" }` |
+| GET | `/admin/tickets` | `SupportTicket[]` |
+| POST | `/admin/tickets/:id/resolve` | → resolved |
+| GET | `/admin/audit` | `AdminAuditEntry[]` newest first |
+
+All admin mutations should append an audit entry.
 
 ## Suggested PostgreSQL tables
 `users` (id, name, email unique, password_hash, role, status, weekly_goal, weekly_reminder, created_at) ·

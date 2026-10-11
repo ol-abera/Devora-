@@ -5,9 +5,11 @@ import { meApi } from "@/api"
 import { useNotifications, keys } from "@/hooks/queries"
 import { useAuth } from "@/context/AuthContext"
 import { EmptyState, ErrorState, PageShell, Spinner } from "@/components/ui"
+import { useI18n } from "@/i18n"
 import { formatDate } from "@/lib/money"
 
 export default function NotificationsPage() {
+  const { t } = useI18n()
   const { user } = useAuth()
   const qc = useQueryClient()
   const { data, isLoading, isError, error, refetch } = useNotifications()
@@ -19,11 +21,11 @@ export default function NotificationsPage() {
   return (
     <PageShell narrow>
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2"><Bell className="text-[#7C3AED]" /> Notifications</h1>
-        {unread > 0 && <button onClick={() => readAll.mutate()} className="inline-flex items-center gap-1.5 text-sm font-medium text-[#7C3AED]"><CheckCheck size={16} /> Mark all read</button>}
+        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2"><Bell className="text-[#7C3AED]" /> {t("notifications.title")}</h1>
+        {unread > 0 && <button onClick={() => readAll.mutate()} className="inline-flex items-center gap-1.5 text-sm font-medium text-[#7C3AED]"><CheckCheck size={16} /> {t("notifications.markAll")}</button>}
       </div>
-      {isLoading ? <Spinner label="Loading notifications" /> : isError ? <ErrorState message={error.message} onRetry={() => refetch()} /> : !data?.length ? (
-        <div className="mt-6 bg-white rounded-2xl border border-slate-100"><EmptyState icon={<Bell size={40} />} title="You're all caught up." hint="Payment, course, and certificate updates show up here." /></div>
+      {isLoading ? <Spinner label={t("notifications.loading")} /> : isError ? <ErrorState message={error.message} onRetry={() => refetch()} /> : !data?.length ? (
+        <div className="mt-6 bg-white rounded-2xl border border-slate-100"><EmptyState icon={<Bell size={40} />} title={t("notifications.empty")} hint={t("notifications.emptyHint")} /></div>
       ) : (
         <ul className="mt-6 space-y-2">
           {data.map(n => {
@@ -31,7 +33,7 @@ export default function NotificationsPage() {
               <>
                 <div className="flex items-start justify-between gap-3">
                   <p className={`text-sm ${n.read ? "text-slate-700" : "font-semibold text-slate-900"}`}>{n.title}</p>
-                  {!n.read && <span className="w-2 h-2 rounded-full bg-[#7C3AED] mt-1.5 shrink-0" aria-label="Unread" />}
+                  {!n.read && <span className="w-2 h-2 rounded-full bg-[#7C3AED] mt-1.5 shrink-0" aria-label={t("notifications.unread")} />}
                 </div>
                 <p className="text-sm text-slate-500 mt-0.5">{n.body}</p>
                 <p className="text-[11px] text-slate-400 mt-1">{formatDate(n.createdAt)}</p>

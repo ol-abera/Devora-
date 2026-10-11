@@ -6,9 +6,9 @@ import { motion, AnimatePresence } from "framer-motion"
 import { ChevronDown, ChevronRight, Star, Users, Clock, BookOpen, Play, FileText, Award, Globe, ShieldCheck, Bookmark, BookmarkCheck, Check } from "lucide-react"
 import { coursesApi } from "@/api"
 import { useApp } from "@/hooks/useApp"
-import { useCourse, useReviews, keys } from "@/hooks/queries"
+import { useCourse, useCourses, useReviews, keys } from "@/hooks/queries"
 import { formatDate, formatEtb, isFreeCourse } from "@/lib/money"
-import { ErrorState, PageShell, Spinner } from "@/components/ui"
+import { ErrorState, PageShell, SkeletonCards, Spinner } from "@/components/ui"
 
 const lessonIcons: Record<string, React.ReactNode> = {
   video: <Play size={14} />, quiz: <FileText size={14} />, project: <Award size={14} />, reading: <BookOpen size={14} />,
@@ -20,8 +20,25 @@ export function CourseDetailPage() {
   const [expandedModules, setExpandedModules] = useState<string[]>([])
   const courseQ = useCourse(courseId)
   const reviewsQ = useReviews(courseId)
+  // Related courses: same category, filtered client-side once course loads
+  const relatedQ = useCourses({ category: courseQ.data?.category, limit: 6, sort: "popular" })
 
-  if (courseQ.isLoading) return <PageShell><Spinner label="Loading course" /></PageShell>
+  if (courseQ.isLoading) return (
+    <PageShell>
+      <div className="animate-pulse space-y-6">
+        <div className="h-48 rounded-2xl bg-slate-200" />
+        <div className="grid lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-4">
+            <div className="h-6 w-2/3 bg-slate-200 rounded" />
+            <div className="h-4 w-full bg-slate-100 rounded" />
+            <div className="h-4 w-5/6 bg-slate-100 rounded" />
+            <div className="h-40 bg-slate-100 rounded-xl" />
+          </div>
+          <div className="h-64 bg-slate-100 rounded-2xl" />
+        </div>
+      </div>
+    </PageShell>
+  )
   const course = courseQ.data
   if (courseQ.isError || !course) {
     return (
@@ -154,7 +171,40 @@ export function CourseDetailPage() {
             {/* Reviews */}
             <section className="bg-white rounded-2xl p-6 border border-slate-100">
               <h2 className="text-xl font-bold text-slate-900 mb-4">Student reviews</h2>
-              {reviewsQ.isLoading ? <Spinner label="Loading reviews" /> : reviewsQ.isError ? (
+              <div className="flex flex-wrap items-center gap-4 mb-5 p-4 rounded-xl bg-slate-50 border border-slate-100">
+                <div className="text-center min-w-[72px]">
+                  <p className="text-3xl font-bold text-slate-900">{course.rating.toFixed(1)}</p>
+                  <p className="flex items-center justify-center gap-0.5 mt-1" aria-hidden>
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} size={12} className={i < Math.round(course.rating) ? "text-amber-400 fill-amber-400" : "text-slate-200"} />
+                    ))}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">{course.reviews} ratings</p>
+                </div>
+                <div className="flex-1 min-w-[160px] space-y-1">
+                  {[5, 4, 3, 2, 1].map(stars => {
+                    // Approximate distribution from average when the API does not send a histogram
+                    const weights = [5, 4, 3, 2, 1].map(x => Math.max(0, 1 - Math.abs(course.rating - x) * 0.35))
+                    const total = weights.reduce((s, w) => s + w, 0) || 1
+                    const weight = Math.max(0, 1 - Math.abs(course.rating - stars) * 0.35)
+                    const pct = course.reviews > 0 ? Math.round((weight / total) * 100) : 0
+                    return (
+                      <div key={stars} className="flex items-center gap-2 text-xs text-slate-500">
+                        <span className="w-3">{stars}</span>
+                        <div className="flex-1 h-1.5 rounded-full bg-slate-200 overflow-hidden">
+                          <div className="h-full bg-amber-400 rounded-full" style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="w-8 text-right">{pct}%</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+              {reviewsQ.isLoading ? (
+                <div className="space-y-3 animate-pulse">
+                  {[1, 2, 3].map(i => <div key={i} className="h-16 bg-slate-100 rounded-xl" />)}
+                </div>
+              ) : reviewsQ.isError ? (
                 <ErrorState message={reviewsQ.error.message} onRetry={() => reviewsQ.refetch()} />
               ) : (reviewsQ.data?.items.length ?? 0) === 0 ? (
                 <p className="text-sm text-slate-500">No reviews yet. Be the first after you enroll.</p>
@@ -174,6 +224,40 @@ export function CourseDetailPage() {
               )}
               {user && isEnrolled(course.id) && <ReviewForm courseId={course.id} />}
             </section>
+
+            {/* Similar courses in this category */}
+            {(() => {
+              const related = (relatedQ.data?.items ?? []).filter(c => c.id !== course.id).slice(0, 3)
+              if (relatedQ.isLoading) {
+                return (
+                  <section className="bg-white rounded-2xl p-6 border border-slate-100">
+                    <h2 className="text-xl font-bold text-slate-900 mb-4">Related courses</h2>
+                    <div className="grid sm:grid-cols-3 gap-3 animate-pulse">
+                      {[1,2,3].map(i => <div key={i} className="h-28 bg-slate-100 rounded-xl" />)}
+                    </div>
+                  </section>
+                )
+              }
+              if (!related.length) return null
+              return (
+                <section className="bg-white rounded-2xl p-6 border border-slate-100">
+                  <h2 className="text-xl font-bold text-slate-900 mb-4">Related courses</h2>
+                  <div className="grid sm:grid-cols-3 gap-3">
+                    {related.map(c => (
+                      <Link key={c.id} to={`/courses/${c.id}`} className="rounded-xl border border-slate-100 p-3 hover:border-[#7C3AED]/40 hover:shadow-sm transition-all">
+                        <p className="text-xs text-[#7C3AED] font-medium mb-1">{c.category}</p>
+                        <p className="text-sm font-semibold text-slate-900 line-clamp-2">{c.title}</p>
+                        <p className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                          <Star size={11} className="text-amber-400 fill-amber-400" /> {c.rating}
+                          <span className="mx-1">·</span>
+                          {formatEtb(c.price)}
+                        </p>
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              )
+            })()}
 
             {/* Instructor */}
             <section className="bg-white rounded-2xl p-6 border border-slate-100">

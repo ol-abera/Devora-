@@ -144,6 +144,11 @@ export interface LessonContent {
   videoUrl?: string
   codeSnippet?: string
   language?: string
+  /** Optional short explanations / subtitles in local languages (English body remains primary). */
+  explanations?: {
+    am?: string // Amharic
+    om?: string // Afaan Oromo
+  }
   quiz?: QuizQuestion[]
   exercises?: string[]
   keyTakeaways: string[]
@@ -234,12 +239,15 @@ export interface UpdateProfileRequest {
   name?: string
   weeklyReminder?: boolean
   weeklyGoal?: number
+  locale?: "en" | "am" | "om"
 }
 
 export interface Profile extends User {
   weeklyReminder: boolean
   weeklyGoal: number // lessons per week the student wants to finish
   lessonsThisWeek: number // lessons completed in the last 7 days (server computes this)
+  /** UI language preference; synced from settings when the user is signed in. */
+  locale?: "en" | "am" | "om"
 }
 
 /* ---------------- Instructor ---------------- */
@@ -336,3 +344,50 @@ export interface AdminReport {
   status: "open" | "dismissed" | "actioned"
   createdAt: string
 }
+
+export interface AdminUserRow {
+  id: string
+  name: string
+  email: string
+  role: Role
+  status: "active" | "suspended" | "pending"
+  createdAt: string
+  coursesOwned?: number
+}
+
+export interface AdminTransaction {
+  txRef: string
+  courseTitle: string
+  amountEtb: number
+  status: PaymentStatus
+  accessGranted: boolean
+  buyerName: string
+  email: string
+  createdAt: string
+  paidAt: string | null
+}
+
+export interface AdminAuditEntry {
+  id: string
+  actorId: string
+  actorName: string
+  action: string
+  targetType: "user" | "course" | "payment" | "report" | "system"
+  targetId: string
+  detail: string
+  createdAt: string
+}
+
+export interface AdminPendingCourse {
+  id: string
+  title: string
+  subtitle: string
+  instructorName: string
+  instructorId: string
+  price: number
+  level: CourseLevel
+  status: CourseStatus
+  submittedAt: string
+  rejectionReason?: string
+}
+
