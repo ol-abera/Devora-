@@ -1,0 +1,344 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING
+}
+
+enum CourseStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+}
+
+enum CourseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum LessonType {
+  VIDEO
+  QUIZ
+  PROJECT
+  READING
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
+}
+
+model User {
+  id                String     @id @default(uuid()) @db.Uuid
+  name              String
+  email             String     @unique
+  passwordHash      String?
+  role              UserRole   @default(STUDENT)
+  status            UserStatus @default(PENDING)
+  avatar            String     @default("")
+  preferredLanguage String     @default("en")
+  emailVerified     Boolean    @default(false)
+  weeklyReminder    Boolean    @default(false)
+  weeklyGoal        Int        @default(5)
+  createdAt         DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime   @updatedAt @db.Timestamptz(3)
+
+  authIdentities AuthIdentity[]
+  courses        Course[]          @relation("CourseInstructor")
+  enrollments    Enrollment[]
+  progress       LessonProgress[]
+  orders         Order[]
+  reviews        Review[]
+  certificates   Certificate[]
+  notifications  AppNotification[]
+  quizAttempts   QuizAttempt[]
+  auditEntries   AuditLog[]         @relation("AuditActor")
+  bookmarks      Bookmark[]
+}
+
+model AuthIdentity {
+  id              String   @id @default(uuid()) @db.Uuid
+  provider        String
+  providerSubject String
+  userId          String   @db.Uuid
+  createdAt       DateTime @default(now()) @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerSubject])
+  @@unique([userId, provider])
+}
+
+model Course {
+  id              String       @id @default(uuid()) @db.Uuid
+  title           String
+  subtitle        String       @default("")
+  slug            String       @unique
+  description     String       @db.Text
+  category        String       @default("General")
+  level           CourseLevel  @default(BEGINNER)
+  price           Int          @default(0)
+  originalPrice   Int          @default(0)
+  currency        String       @default("ETB")
+  language        String       @default("en")
+  status          CourseStatus @default(DRAFT)
+  thumbnailUrl    String?
+  tags            String[]     @default([])
+  whatYouLearn    String[]     @default([])
+  prerequisites   String[]     @default([])
+  featured        Boolean      @default(false)
+  popular         Boolean      @default(false)
+  duration        String       @default("0h")
+  instructorId    String       @db.Uuid
+  submittedAt     DateTime?    @db.Timestamptz(3)
+  rejectionReason String?
+  createdAt       DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime     @updatedAt @db.Timestamptz(3)
+
+  instructor  User         @relation("CourseInstructor", fields: [instructorId], references: [id], onDelete: Restrict)
+  sections    Section[]
+  enrollments Enrollment[]
+  orders      Order[]
+  reviews     Review[]
+  bookmarks   Bookmark[]
+}
+
+model Section {
+  id        String   @id @default(uuid()) @db.Uuid
+  title     String
+  position  Int
+  courseId  String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
+
+  @@unique([courseId, position])
+}
+
+model Lesson {
+  id          String     @id @default(uuid()) @db.Uuid
+  title       String
+  description String?    @db.Text
+  content     String?    @db.Text
+  videoUrl    String?
+  duration    String     @default("0:00")
+  type        LessonType @default(VIDEO)
+  position    Int
+  isFree      Boolean    @default(false)
+  sectionId   String     @db.Uuid
+  createdAt   DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime   @updatedAt @db.Timestamptz(3)
+
+  section   Section          @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  progress  LessonProgress[]
+  questions QuizQuestion[]
+}
+
+model Enrollment {
+  id          String           @id @default(uuid()) @db.Uuid
+  studentId   String           @db.Uuid
+  courseId    String           @db.Uuid
+  status      EnrollmentStatus @default(ACTIVE)
+  source      String           @default("free")
+  enrolledAt  DateTime         @default(now()) @db.Timestamptz(3)
+  completedAt DateTime?        @db.Timestamptz(3)
+
+  student User   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course  Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId])
+}
+
+model LessonProgress {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @db.Uuid
+  lessonId    String    @db.Uuid
+  completed   Boolean   @default(false)
+  completedAt DateTime? @db.Timestamptz(3)
+  updatedAt   DateTime  @updatedAt @db.Timestamptz(3)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+}
+
+model Order {
+  id        String      @id @default(uuid()) @db.Uuid
+  studentId String      @db.Uuid
+  courseId  String      @db.Uuid
+  amount    Int
+  currency  String      @default("ETB")
+  status    OrderStatus @default(PENDING)
+  createdAt DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime    @updatedAt @db.Timestamptz(3)
+
+  student User    @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  course  Course  @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  payment Payment?
+}
+
+model Payment {
+  id                String        @id @default(uuid()) @db.Uuid
+  orderId           String        @unique @db.Uuid
+  txRef             String        @unique
+  provider           String        @default("chapa")
+  providerReference String?       @unique
+  status             PaymentStatus @default(PENDING)
+  amount             Int
+  currency           String        @default("ETB")
+  email              String
+  phone              String
+  buyerName          String
+  createdAt          DateTime      @default(now()) @db.Timestamptz(3)
+  paidAt             DateTime?     @db.Timestamptz(3)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
+}
+
+model Review {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  courseId  String   @db.Uuid
+  rating    Int
+  comment   String   @db.Text
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+model QuizQuestion {
+  id        String   @id @default(uuid()) @db.Uuid
+  lessonId  String   @db.Uuid
+  question  String   @db.Text
+  options   Json
+  correct   Int
+  position  Int
+
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([lessonId, position])
+}
+
+model QuizAttempt {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @db.Uuid
+  lessonId    String   @db.Uuid
+  answers     Json
+  score       Int
+  total       Int
+  passed      Boolean
+  attemptedAt DateTime @default(now()) @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+model Certificate {
+  id           String   @id @default(uuid()) @db.Uuid
+  credentialId String   @unique
+  userId       String   @db.Uuid
+  courseId     String   @db.Uuid
+  courseTitle  String
+  studentName  String
+  issuedAt     DateTime @default(now()) @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+
+model AppNotification {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  title     String
+  body      String   @db.Text
+  type      String
+  read      Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SupportTicket {
+  id        String   @id @default(uuid()) @db.Uuid
+  subject   String
+  message   String   @db.Text
+  email     String
+  status    String   @default("open")
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+}
+
+model AdminReport {
+  id         String   @id @default(uuid()) @db.Uuid
+  type       String
+  targetId   String   @db.Uuid
+  reason     String   @db.Text
+  status     String   @default("open")
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  actorId    String   @db.Uuid
+  action     String
+  targetType String
+  targetId   String   @db.Uuid
+  detail     String   @db.Text
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+
+  actor User @relation("AuditActor", fields: [actorId], references: [id], onDelete: Restrict)
+}
+
+
+model Bookmark {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  courseId  String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
