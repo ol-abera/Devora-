@@ -52,6 +52,7 @@ router.get("/courses", async (req, res) => {
     const price = typeof req.query.price === "string" ? req.query.price : "";
     const sort = typeof req.query.sort === "string" ? req.query.sort : "newest";
     const featured = req.query.featured === "true";
+    const popular = req.query.popular === "true";
     const where: any = { status: "PUBLISHED" };
     if (search) where.OR = ["title", "subtitle", "description", "category"].map((key) => ({ [key]: { contains: search, mode: "insensitive" } }));
     if (category) where.category = { equals: category, mode: "insensitive" };
@@ -59,6 +60,7 @@ router.get("/courses", async (req, res) => {
     if (price === "free") where.price = 0;
     if (price === "paid") where.price = { gt: 0 };
     if (featured) where.featured = true;
+    if (popular) where.popular = true;
     const orderBy: any = sort === "price-low" ? { price: "asc" } : sort === "price-high" ? { price: "desc" } : { createdAt: "desc" };
     const [total, courses] = await Promise.all([
       prisma.course.count({ where }),
