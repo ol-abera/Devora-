@@ -43,7 +43,7 @@ export function Navbar() {
     : { to: "/dashboard", label: t("nav.myLearning") }
   const item = "w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 focus-visible:bg-slate-50 focus-visible:outline-none"
   const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? "bg-[#EDE9FE] text-[#5B21B6]" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"}`
+    `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? "bg-[#FDF0E6] text-[#A8643F]" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"}`
 
   return (
     <nav aria-label="Main" className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100">
@@ -120,7 +120,7 @@ export function Navbar() {
                 </div>
               </>
             ) : (
-              <Link to="/login" className="hidden sm:inline-flex px-4 py-2 rounded-lg bg-[#7C3AED] text-white text-sm font-medium hover:bg-[#6D28D9]">{t("nav.signIn")}</Link>
+              <Link to="/login" className="hidden sm:inline-flex px-4 py-2 rounded-lg bg-[#C27850] text-white text-sm font-medium hover:bg-[#A8643F] shadow-sm shadow-[#C27850]/25">{t("nav.signIn")}</Link>
             )}
 
             <button onClick={() => setMobileOpen(!mobileOpen)} aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen} className="md:hidden p-2 rounded-lg hover:bg-slate-50">
@@ -162,18 +162,19 @@ export function Navbar() {
 
 export function Footer() {
   const { t } = useI18n()
-  const col = "space-y-2 text-sm"
-  const link = "hover:text-white transition-colors"
+  const col = "space-y-2.5 text-sm"
+  const link = "text-[#C4A994] hover:text-white transition-colors"
   return (
-    <footer className="theme-light bg-slate-900 text-slate-300">
+    <footer className="theme-light bg-[#2C1810] text-[#C4A994]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
           <div className="col-span-2 md:col-span-1">
             <div className="mb-4"><Logo textClass="text-lg font-bold text-white" /></div>
-            <p className="text-sm text-slate-400 leading-relaxed">{t("footer.tagline")}</p>
+            <p className="text-sm text-[#A8907C] leading-relaxed">{t("footer.tagline")}</p>
+            <p className="mt-4 text-xs text-[#8B735F]">Learn · Practice · Build — in ETB</p>
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-white mb-3">Platform</h4>
+            <h4 className="text-sm font-semibold text-white mb-4">Platform</h4>
             <ul className={col}>
               <li><Link to="/courses" className={link}>{t("footer.allCourses")}</Link></li>
               <li><Link to="/playground" className={link}>{t("footer.playground")}</Link></li>
@@ -181,16 +182,24 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-white mb-3">Account</h4>
+            <h4 className="text-sm font-semibold text-white mb-4">Account</h4>
             <ul className={col}>
               <li><Link to="/login" className={link}>{t("footer.signIn")}</Link></li>
               <li><Link to="/register" className={link}>{t("footer.createAccount")}</Link></li>
               <li><Link to="/purchases" className={link}>{t("footer.purchases")}</Link></li>
             </ul>
           </div>
+          <div>
+            <h4 className="text-sm font-semibold text-white mb-4">Support</h4>
+            <ul className={col}>
+              <li><a href="#faq" className={link}>FAQ</a></li>
+              <li><Link to="/verify" className={link}>Verify certificate</Link></li>
+            </ul>
+          </div>
         </div>
-        <div className="mt-12 pt-8 border-t border-slate-800">
-          <p className="text-xs text-slate-500">© {new Date().getFullYear()} Devora. All rights reserved.</p>
+        <div className="mt-12 pt-8 border-t border-[#4A3228] flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-xs text-[#8B735F]">© {new Date().getFullYear()} Devora. All rights reserved.</p>
+          <p className="text-xs text-[#8B735F]">Made with care for Ethiopian learners</p>
         </div>
       </div>
     </footer>

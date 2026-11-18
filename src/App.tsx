@@ -42,6 +42,7 @@ function LocaleSync() {
   return null
 }
 
+/** Main app chrome: navbar + footer */
 function Layout() {
   return (
     <>
@@ -51,6 +52,17 @@ function Layout() {
       <div id="main"><Outlet /></div>
       <Footer />
       <FloatingAITutor />
+    </>
+  )
+}
+
+/** Auth pages: no navbar, no footer, no floating tutor — single screen */
+function AuthLayout() {
+  return (
+    <>
+      <LocaleSync />
+      <ScrollToTop />
+      <Outlet />
     </>
   )
 }
@@ -72,16 +84,21 @@ export default function App() {
   return (
     <>
       <Routes>
+        {/* Auth routes — no navbar / footer */}
+        <Route element={<AuthLayout />}>
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
+          <Route path="forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="reset-password" element={<ResetPasswordPage />} />
+        </Route>
+
+        {/* Everything else */}
         <Route element={<Layout />}>
           {/* public */}
           <Route index element={<LandingPage />} />
           <Route path="courses" element={<CoursesPage />} />
           <Route path="courses/:courseId" element={<CourseDetailPage />} />
           <Route path="learn/:courseId/:lessonId?" element={<CourseLearningPage />} />
-          <Route path="login" element={<LoginPage />} />
-          <Route path="register" element={<RegisterPage />} />
-          <Route path="forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="reset-password" element={<ResetPasswordPage />} />
           <Route path="verify" element={<VerifyCertificatePage />} />
           <Route path="verify/:credentialId" element={<VerifyCertificatePage />} />
           <Route path="mock-chapa/:txRef" element={<MockChapaPage />} />
